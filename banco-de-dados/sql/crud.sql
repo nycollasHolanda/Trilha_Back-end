@@ -76,3 +76,14 @@ SELECT
 FROM usuarios u
 INNER JOIN vendas v ON u.id = v.usuario_id
 GROUP BY u.id, u.nome;
+
+-- Teste de usando comandos DELETE:
+
+-- TESTE A (Deve dar ERRO proposital):
+-- Tentar apagar o cliente Carlos (id = 2) que já possui uma venda registrada.
+-- O MySQL vai bloquear com erro de Foreign Key (Cannot delete or update a parent row).
+DELETE FROM usuarios WHERE id = 2;
+
+-- TESTE B (Deve FUNCIONAR):
+-- Apagar a cliente Jussara Cardoso (id = 3) que ainda não fez nenhuma compra.
+DELETE FROM usuarios WHERE id = 3;
