@@ -25,11 +25,54 @@ INSERT INTO vendas (usuario_id, valor_total) VALUES
 (2, 219.80);
 
 INSERT INTO itens_venda (venda_id, produto_id, quantidade, preco_unitario) VALUES
-(1, 1, 1, 129.90),
-(1, 2, 1, 89.90);
+(1, 1, 1, 249.90),
+(1, 2, 3, 310.10);
 
 SELECT * FROM usuarios;
 SELECT * FROM categorias;
 SELECT * FROM produtos;
 SELECT * FROM vendas;
 SELECT * FROM itens_venda;
+
+-- Simulando a baixa e almento no estoque após a venda 1 (tirou 1 Disco LP Cartola e 3 Discos do Iron Maiden)
+UPDATE produtos SET quantidade_estoque = quantidade_estoque - 1 WHERE id = 1;
+UPDATE produtos SET quantidade_estoque = quantidade_estoque - 3 WHERE id = 2;
+
+-- Simulando Reposição de estoque após venda 
+UPDATE produtos SET quantidade_estoque = quantidade_estoque + 10 WHERE id = 2;
+
+-- Conferindo o estoque atualizado
+SELECT id, nome, quantidade_estoque FROM produtos;
+
+-- Consulta 01: Listar produtos mostrando o nome da Categoria (INNER JOIN)
+SELECT 
+    p.id,
+    p.nome AS produto,
+    c.nome AS categoria,
+    p.preco_venda,
+    p.quantidade_estoque
+FROM produtos p
+INNER JOIN categorias c ON p.categoria_id = c.id;
+
+-- Consulta 02: Detalhar os itens de uma venda com nome do cliente e do produto
+SELECT 
+    v.id AS numero_venda,
+    u.nome AS cliente,
+    v.data_venda,
+    p.nome AS produto,
+    iv.quantidade,
+    iv.preco_unitario,
+    (iv.quantidade * iv.preco_unitario) AS subtotal
+FROM itens_venda iv
+INNER JOIN vendas v ON iv.venda_id = v.id
+INNER JOIN usuarios u ON v.usuario_id = u.id
+INNER JOIN produtos p ON iv.produto_id = p.id;
+
+-- Consulta 03: Faturamento total agrupado por cliente (GROUP BY + SUM)
+SELECT 
+    u.nome AS cliente,
+    COUNT(v.id) AS total_pedidos,
+    SUM(v.valor_total) AS total_gasto
+FROM usuarios u
+INNER JOIN vendas v ON u.id = v.usuario_id
+GROUP BY u.id, u.nome;
